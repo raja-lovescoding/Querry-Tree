@@ -1,0 +1,28 @@
+// Message model placeholder.
+
+import mongoose from "mongoose";
+
+const messageSchema = new mongoose.Schema(
+  {
+    content: {
+      type: String,
+      required: true,
+    },
+    role: {
+      type: String,
+      enum: ["user", "assistant"],
+      required: true,
+    },
+    parentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+      default: null,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+const Message = mongoose.model("Message", messageSchema);
+
+export default Message; 
