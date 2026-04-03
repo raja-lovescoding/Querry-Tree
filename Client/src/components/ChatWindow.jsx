@@ -5,10 +5,10 @@ import { sendMessage } from "../services/api";
 
 const ChatWindow = () => {
   const [messages, setMessages] = useState([]);
-  const [lastId, setLastId] = useState(null);
+  const [activeNodeId, setActiveNodeId] = useState(null);
 
   const handleSend = async (text) => {
-    const data = await sendMessage(text, lastId);
+    const data = await sendMessage(text, activeNodeId);
 
     const newMessages = [
       ...messages,
@@ -17,7 +17,9 @@ const ChatWindow = () => {
     ];
 
     setMessages(newMessages);
-    setLastId(data.assistant._id);
+
+    // move active node to latest AI message
+    setActiveNodeId(data.assistant._id);
   };
 
   return (
@@ -26,12 +28,17 @@ const ChatWindow = () => {
 
       <div>
         {messages.map((msg) => (
-          <Message key={msg._id} msg={msg} />
+          <Message
+            key={msg._id}
+            msg={msg}
+            onSelect={setActiveNodeId}
+            isActive={msg._id === activeNodeId}
+          />
         ))}
       </div>
 
       <InputBox onSend={handleSend} />
-    </div> 
+    </div>
   );
 };
 
