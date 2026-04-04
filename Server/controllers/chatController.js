@@ -64,7 +64,7 @@ export const createMessage = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Failed to process message" });
+    res.status(500).json({ error: error.message || "Failed to process message" });
   }
 };
 

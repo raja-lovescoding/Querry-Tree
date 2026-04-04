@@ -20,6 +20,7 @@ const ChatWindow = () => {
   const [activeNodeId, setActiveNodeId] = useState(null);
   const [branches, setBranches] = useState([]);
   const [activeBranchId, setActiveBranchId] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadConversations = async () => {
@@ -84,13 +85,18 @@ const ChatWindow = () => {
   }, [activeBranchId, branches]);
 
   const handleCreateConversation = async () => {
-    const conversation = await createConversation();
-    if (!conversation?._id) {
-      return;
-    }
+    try {
+      const conversation = await createConversation();
+      if (!conversation?._id) {
+        return;
+      }
 
-    setConversations((prev) => [conversation, ...prev]);
-    setActiveConversationId(conversation._id);
+      setConversations((prev) => [conversation, ...prev]);
+      setActiveConversationId(conversation._id);
+      setError("");
+    } catch (err) {
+      setError(err.message || "Failed to create conversation");
+    }
   };
 
   const handleSend = async (text) => {
@@ -98,38 +104,43 @@ const ChatWindow = () => {
       return;
     }
 
-    const data = await sendMessage(
-      text,
-      activeNodeId,
-      activeBranchId,
-      activeConversationId
-    );
+    try {
+      const data = await sendMessage(
+        text,
+        activeNodeId,
+        activeBranchId,
+        activeConversationId
+      );
 
-    setMessages((prev) => [...prev, data.user, data.assistant]);
-    setActiveNodeId(data.assistant._id);
+      setMessages((prev) => [...prev, data.user, data.assistant]);
+      setActiveNodeId(data.assistant._id);
 
-    if (data.branch?._id) {
-      setActiveBranchId(data.branch._id);
-      setBranches((prev) => {
-        const hasExisting = prev.some((b) => b._id === data.branch._id);
+      if (data.branch?._id) {
+        setActiveBranchId(data.branch._id);
+        setBranches((prev) => {
+          const hasExisting = prev.some((b) => b._id === data.branch._id);
 
-        if (hasExisting) {
-          return prev.map((b) =>
-            b._id === data.branch._id ? { ...b, ...data.branch } : b
-          );
-        }
+          if (hasExisting) {
+            return prev.map((b) =>
+              b._id === data.branch._id ? { ...b, ...data.branch } : b
+            );
+          }
 
-        return [...prev, data.branch];
-      });
+          return [...prev, data.branch];
+        });
+      }
+
+      setConversations((prev) =>
+        prev.map((conversation) =>
+          conversation._id === activeConversationId
+            ? { ...conversation, lastMessageId: data.assistant._id }
+            : conversation
+        )
+      );
+      setError("");
+    } catch (err) {
+      setError(err.message || "Failed to send message");
     }
-
-    setConversations((prev) =>
-      prev.map((conversation) =>
-        conversation._id === activeConversationId
-          ? { ...conversation, lastMessageId: data.assistant._id }
-          : conversation
-      )
-    );
   };
 
   const visibleMessages = activeNodeId ? getPath(messages, activeNodeId) : messages;
@@ -145,6 +156,7 @@ const ChatWindow = () => {
 
       <div style={{ flex: 1, padding: "20px" }}>
         <h2>ConceptTree Chat</h2>
+        {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
 
         <div>
           {visibleMessages.map((msg) => (

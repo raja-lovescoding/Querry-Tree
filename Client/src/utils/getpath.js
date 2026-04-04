@@ -1,6 +1,7 @@
 export const getPath = (messages, activeId) => {
   const map = {};
-  messages.forEach((msg) => {
+  (Array.isArray(messages) ? messages : []).forEach((msg) => {
+    if (!msg?._id) return;
     map[msg._id] = msg;
   });
 
