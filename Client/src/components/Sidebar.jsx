@@ -6,6 +6,8 @@ const Sidebar = ({ messages, onSelect, activeNodeId }) => {
   return (
     <div
       style={{
+        display: "flex",
+        flexDirection: "column",
         width: "220px",
         borderRight: "1px solid #ccc",
         padding: "10px",

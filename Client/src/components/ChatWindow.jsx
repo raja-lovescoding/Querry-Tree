@@ -46,6 +46,11 @@ const visibleMessages = activeNodeId
     <div style={{ padding: "20px" }}>
       <h2>ConceptTree Chat</h2>
     <Sidebar
+        style={{ 
+          float: "left" ,
+          display: "flex",
+          flexDirection: "row"
+          }}
         messages={messages}
         onSelect={setActiveNodeId}
         activeNodeId={activeNodeId}
