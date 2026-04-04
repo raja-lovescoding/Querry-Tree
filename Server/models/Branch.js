@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const branchSchema = new mongoose.Schema(
   {
+    conversationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Conversation",
+      required: true,
+      index: true,
+    },
     parentBranchId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Branch",

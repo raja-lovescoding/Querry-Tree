@@ -6,9 +6,14 @@ const router = express.Router();
 // create new branch
 router.post("/", async (req, res) => {
   try {
-    const { parentBranchId, lastMessageId } = req.body;
+    const { parentBranchId, lastMessageId, conversationId } = req.body;
+
+    if (!conversationId) {
+      return res.status(400).json({ error: "conversationId is required" });
+    }
 
     const branch = await Branch.create({
+      conversationId,
       parentBranchId: parentBranchId || null,
       lastMessageId,
     });
@@ -21,7 +26,13 @@ router.post("/", async (req, res) => {
 
 // get all branches
 router.get("/", async (req, res) => {
-  const branches = await Branch.find();
+  const { conversationId } = req.query;
+
+  if (!conversationId) {
+    return res.status(400).json({ error: "conversationId is required" });
+  }
+
+  const branches = await Branch.find({ conversationId }).sort({ createdAt: 1 });
   res.json(branches);
 });
 

@@ -1,6 +1,13 @@
 import { createBranch } from "../services/api";
 
-const Message = ({ msg, onSelect, isActive, activeBranchId, onBranchCreate }) => {
+const Message = ({
+  msg,
+  onSelect,
+  isActive,
+  activeBranchId,
+  activeConversationId,
+  onBranchCreate,
+}) => {
   return (
     <div
       onClick={() => onSelect(msg._id)}
@@ -19,7 +26,8 @@ const Message = ({ msg, onSelect, isActive, activeBranchId, onBranchCreate }) =>
           e.stopPropagation();
           const newBranch = await createBranch(
             activeBranchId || null,
-            msg._id
+            msg._id,
+            activeConversationId
           );
 
           if (onBranchCreate) {

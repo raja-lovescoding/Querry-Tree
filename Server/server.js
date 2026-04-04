@@ -4,6 +4,7 @@ import express from "express";
 import chatRoutes from "./routes/chatRoutes.js";
 import cors from "cors";
 import branchRoutes from "./routes/branchRoutes.js";
+import conversationRoutes from "./routes/conversationRoutes.js";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.get("/test", (_req, res) => {
 
 app.use("/api/chat", chatRoutes);
 app.use("/branches", branchRoutes);
+app.use("/conversations", conversationRoutes);
 app.get("/health", (_req, res) => {
   res.json({ ok: true });
 });

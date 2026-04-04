@@ -1,22 +1,56 @@
 import { useState } from "react";
 import Message from "./Message";
 import InputBox from "./InputBox";
-import { fetchBranches, fetchMessages, sendMessage } from "../services/api";
+import {
+  createConversation,
+  fetchBranches,
+  fetchConversations,
+  fetchMessages,
+  sendMessage,
+} from "../services/api";
 import { getPath } from "../utils/getpath";
 import { useEffect } from "react";
 import Sidebar from "./Sidebar";
+import ConversationSidebar from "./ConversationSidebar";
 
 const ChatWindow = () => {
+  const [conversations, setConversations] = useState([]);
+  const [activeConversationId, setActiveConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [activeNodeId, setActiveNodeId] = useState(null);
   const [branches, setBranches] = useState([]);
   const [activeBranchId, setActiveBranchId] = useState(null);
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadConversations = async () => {
+      const conversationData = await fetchConversations();
+      const safeConversations = Array.isArray(conversationData)
+        ? conversationData
+        : [];
+
+      setConversations(safeConversations);
+
+      if (safeConversations.length > 0) {
+        setActiveConversationId(safeConversations[0]._id);
+      }
+    };
+
+    loadConversations();
+  }, []);
+
+  useEffect(() => {
+    const loadConversationData = async () => {
+      if (!activeConversationId) {
+        setMessages([]);
+        setBranches([]);
+        setActiveBranchId(null);
+        setActiveNodeId(null);
+        return;
+      }
+
       const [branchData, messageData] = await Promise.all([
-        fetchBranches(),
-        fetchMessages(),
+        fetchBranches(activeConversationId),
+        fetchMessages(activeConversationId),
       ]);
 
       const safeBranches = Array.isArray(branchData) ? branchData : [];
@@ -32,26 +66,44 @@ const ChatWindow = () => {
         return;
       }
 
-      if (safeMessages.length > 0) {
-        setActiveNodeId(safeMessages[safeMessages.length - 1]._id);
-      }
+      setActiveBranchId(null);
+      setActiveNodeId(safeMessages.length > 0 ? safeMessages[safeMessages.length - 1]._id : null);
     };
 
-    loadData();
-  }, []);
+    loadConversationData();
+  }, [activeConversationId]);
 
   useEffect(() => {
-  if (!activeBranchId) return;
+    if (!activeBranchId) return;
 
-  const branch = branches.find(b => b._id === activeBranchId);
+    const branch = branches.find((b) => b._id === activeBranchId);
 
-  if (branch) {
-    setActiveNodeId(branch.lastMessageId);
-  }
-}, [activeBranchId, branches]);
+    if (branch) {
+      setActiveNodeId(branch.lastMessageId);
+    }
+  }, [activeBranchId, branches]);
+
+  const handleCreateConversation = async () => {
+    const conversation = await createConversation();
+    if (!conversation?._id) {
+      return;
+    }
+
+    setConversations((prev) => [conversation, ...prev]);
+    setActiveConversationId(conversation._id);
+  };
 
   const handleSend = async (text) => {
-    const data = await sendMessage(text, activeNodeId, activeBranchId);
+    if (!activeConversationId) {
+      return;
+    }
+
+    const data = await sendMessage(
+      text,
+      activeNodeId,
+      activeBranchId,
+      activeConversationId
+    );
 
     setMessages((prev) => [...prev, data.user, data.assistant]);
     setActiveNodeId(data.assistant._id);
@@ -70,45 +122,58 @@ const ChatWindow = () => {
         return [...prev, data.branch];
       });
     }
+
+    setConversations((prev) =>
+      prev.map((conversation) =>
+        conversation._id === activeConversationId
+          ? { ...conversation, lastMessageId: data.assistant._id }
+          : conversation
+      )
+    );
   };
 
   const visibleMessages = activeNodeId ? getPath(messages, activeNodeId) : messages;
 
   return (
-  <div style={{ display: "flex" }}>
-    
-    
+    <div style={{ display: "flex" }}>
+      <ConversationSidebar
+        conversations={conversations}
+        activeConversationId={activeConversationId}
+        onSelect={setActiveConversationId}
+        onCreate={handleCreateConversation}
+      />
 
-    <div style={{ flex: 1, padding: "20px" }}>
-      <h2>ConceptTree Chat</h2>
+      <div style={{ flex: 1, padding: "20px" }}>
+        <h2>ConceptTree Chat</h2>
 
-      <div>
-        {visibleMessages.map((msg) => (
-          <Message
-            key={msg._id}
-            msg={msg}
-            onSelect={setActiveNodeId}
-            isActive={msg._id === activeNodeId}
-            activeBranchId={activeBranchId}
-            onBranchCreate={(branch) => {
-              setBranches((prev) => [...prev, branch]);
-              setActiveBranchId(branch._id);
-              setActiveNodeId(branch.lastMessageId);
-            }}
-          />
-        ))}
+        <div>
+          {visibleMessages.map((msg) => (
+            <Message
+              key={msg._id}
+              msg={msg}
+              onSelect={setActiveNodeId}
+              isActive={msg._id === activeNodeId}
+              activeBranchId={activeBranchId}
+              activeConversationId={activeConversationId}
+              onBranchCreate={(branch) => {
+                setBranches((prev) => [...prev, branch]);
+                setActiveBranchId(branch._id);
+                setActiveNodeId(branch.lastMessageId);
+              }}
+            />
+          ))}
+        </div>
+
+        <InputBox onSend={handleSend} />
       </div>
 
-      <InputBox onSend={handleSend} />
+      <Sidebar
+        branches={branches}
+        onSelect={setActiveBranchId}
+        activeBranchId={activeBranchId}
+      />
     </div>
-    <Sidebar
-      branches={branches}
-      onSelect={setActiveBranchId}
-      activeBranchId={activeBranchId}
-    />
-
-  </div>
-);
+  );
 };
 
 export default ChatWindow;
