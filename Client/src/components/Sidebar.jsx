@@ -36,7 +36,7 @@ const Sidebar = ({ branches, onSelect, activeBranchId }) => {
   );
 
   return (
-    <div style={{ width: "250px", borderRight: "1px solid #ccc" }}>
+    <div style={{ width: "250px", paddingLeft: "1px solid #ccc" }}>
       <h3>Branches</h3>
       {roots.map((root) => renderNode(root))}
     </div>

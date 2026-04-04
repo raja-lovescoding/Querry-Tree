@@ -77,11 +77,7 @@ const ChatWindow = () => {
   return (
   <div style={{ display: "flex" }}>
     
-    <Sidebar
-      branches={branches}
-      onSelect={setActiveBranchId}
-      activeBranchId={activeBranchId}
-    />
+    
 
     <div style={{ flex: 1, padding: "20px" }}>
       <h2>ConceptTree Chat</h2>
@@ -105,6 +101,11 @@ const ChatWindow = () => {
 
       <InputBox onSend={handleSend} />
     </div>
+    <Sidebar
+      branches={branches}
+      onSelect={setActiveBranchId}
+      activeBranchId={activeBranchId}
+    />
 
   </div>
 );
