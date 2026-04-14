@@ -19,6 +19,7 @@ app.get("/test", (_req, res) => {
 });
 
 app.use("/api/chat", chatRoutes);
+app.use("/chat", chatRoutes);
 app.use("/branches", branchRoutes);
 app.use("/conversations", conversationRoutes);
 app.get("/health", (_req, res) => {
@@ -30,6 +31,3 @@ app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`Server running on port ${PORT}`);
 });
-
-
-app.use("/chat", chatRoutes);

@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const branchSchema = new mongoose.Schema(
   {
+    userId: {
+      type: String,
+      required: true,
+      index: true,
+    },
     title: {
       type: String,
       default: "New Branch",
