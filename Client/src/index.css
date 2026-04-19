@@ -46,6 +46,84 @@ body {
   font-size: 14px;
 }
 
+.header-user-menu {
+  position: relative;
+}
+
+.header-user-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 4px 10px 4px 4px;
+  cursor: pointer;
+}
+
+.header-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  overflow: hidden;
+}
+
+.header-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 180px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14);
+  display: none;
+  z-index: 40;
+}
+
+.header-dropdown.is-open {
+  display: block;
+}
+
+.header-dropdown-item {
+  width: 100%;
+  border: none;
+  background: #ffffff;
+  color: #0f172a;
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: default;
+  font-size: 13px;
+}
+
+.header-dropdown-item + .header-dropdown-item {
+  margin-top: 4px;
+}
+
+.header-dropdown-item:disabled {
+  color: #475569;
+}
+
+.header-dropdown-item--danger {
+  color: #b91c1c;
+  cursor: pointer;
+  background: #fff7f7;
+}
+
+.header-dropdown-item--danger:hover {
+  background: #fee2e2;
+}
+
 .header-auth-button {
   padding: 8px 12px;
   border: 1px solid #cbd5e1;
@@ -53,6 +131,82 @@ body {
   background: #fff;
   color: #0f172a;
   cursor: pointer;
+}
+
+/* Consistent PNG icon utilities for assets under /QT icons */
+.qt-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+  image-rendering: -webkit-optimize-contrast;
+  
+}
+
+.qt-icon--sm {
+  width: 14px;
+  height: 14px;
+}
+
+.qt-icon--md {
+  width: 16px;
+  height: 16px;
+}
+
+.qt-icon--lg {
+  width: 18px;
+  height: 18px;
+}
+
+.qt-icon--avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+
+.icon-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-button,
+.menu-action-button,
+.header-dropdown-item,
+.header-user-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-action-button {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.menu-action-button .qt-icon,
+.header-dropdown-item .qt-icon,
+.header-user-trigger .qt-icon {
+  opacity: 0.9;
+}
+
+.menu-action-button:hover .qt-icon,
+.header-dropdown-item:hover .qt-icon,
+.header-user-trigger:hover .qt-icon {
+  opacity: 1;
+}
+
+.header-dropdown-item:disabled .qt-icon {
+  opacity: 0.6;
+}
+
+.action-danger .qt-icon,
+.header-dropdown-item--danger .qt-icon,
+.conversation-delete .qt-icon,
+.branch-delete .qt-icon {
+  opacity: 0.95;
 }
 
 .login-page {
@@ -264,6 +418,9 @@ body {
 
 .conversation-delete {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border: none;
   background: #fee2e2;
   color: #b91c1c;
@@ -287,5 +444,28 @@ body {
 .actions-menu-card .branch-delete,
 .actions-menu-card .conversation-delete {
   display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
   width: 100%;
+}
+
+.Send-message {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Input-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 30px;
 }

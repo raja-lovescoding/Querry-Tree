@@ -383,7 +383,7 @@ const ChatWindow = ({ user, onLogout }) => {
                   background: "#f8fafc",
                 }}
               >
-                No messages match this search in the open conversation.
+                No results found.
               </div>
             ) : null}
             {isStreaming && streamingMessageId ? (
@@ -392,9 +392,9 @@ const ChatWindow = ({ user, onLogout }) => {
               </div>
             ) : null}
           </div>
-          <div style={{ paddingTop: "10px", background: "#ffffff" }}>
+          
             <InputBox onSend={handleSend} />
-          </div>
+          
         </div>
 
         <Sidebar

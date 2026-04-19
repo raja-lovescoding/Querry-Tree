@@ -53,16 +53,18 @@ const SearchBar = ({ value, onChange, onSubmit, onClear }) => {
       <button
         type="submit"
         style={{
-          marginLeft: "10px",
+          marginLeft: "1px",
           padding: "10px 20px",
-          backgroundColor: "#334155",
+          backgroundColor: "#f8fbff",
           color: "#fff",
           border: "none",
           borderRadius: "8px",
           cursor: "pointer",
         }}
       >
-        Search
+        <img className="qt-icon qt-icon--sm" src="/QT%20icons/search.png" alt="" 
+          style={{  width: "20px", height: "20px"}}
+        />
       </button>
     </form>
   );

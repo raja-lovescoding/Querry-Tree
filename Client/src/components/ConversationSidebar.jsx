@@ -61,14 +61,14 @@ const ConversationSidebar = ({
         <button
           onClick={onCreate}
           style={{
-            border: "1px solid #c8ced9",
+            border: "1px solid #ffffff",
             background: "#fff",
             borderRadius: "6px",
             padding: "6px 10px",
             cursor: "pointer",
           }}
         >
-          + New Chat
+            <img className="qt-icon qt-icon--md" src="/QT%20icons/add.png" alt="" />
         </button>
       </div>
 
@@ -146,7 +146,7 @@ const ConversationSidebar = ({
               <div className="actions-menu-card" onClick={(e) => e.stopPropagation()}>
                 <button
                   type="button"
-                  className="conversation-rename"
+                  className="conversation-rename menu-action-button"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleRenameClick(conversation);
@@ -165,11 +165,12 @@ const ConversationSidebar = ({
                     justifyContent: "center",
                   }}
                 >
+                    <img className="qt-icon qt-icon--sm" src="/QT%20icons/edit.png" alt="" />
                   Rename
                 </button>
                 <button
                   type="button"
-                  className="conversation-delete"
+                  className="conversation-delete menu-action-button action-danger"
                   onClick={(e) => {
                     e.stopPropagation();
                     const ok = window.confirm("Delete this conversation?");
@@ -182,6 +183,7 @@ const ConversationSidebar = ({
                     setOpenMenuConversationId(null);
                   }}
                 >
+                    <img className="qt-icon qt-icon--sm" src="/QT%20icons/delete.png" alt="" />
                   Delete
                 </button>
               </div>

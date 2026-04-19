@@ -104,6 +104,7 @@ const Sidebar = ({ branches, onSelect, activeBranchId, onDeleteBranch, onUpdateB
             <div className="actions-menu-card" onClick={(e) => e.stopPropagation()}>
               <button
                 type="button"
+                className="menu-action-button"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRenameClick(node);
@@ -122,10 +123,12 @@ const Sidebar = ({ branches, onSelect, activeBranchId, onDeleteBranch, onUpdateB
                   justifyContent: "center",
                 }}
               >
+                <img className="qt-icon qt-icon--sm" src="/QT%20icons/edit.png" alt="" />
                 Rename
               </button>
               <button
                 type="button"
+                className="branch-delete menu-action-button action-danger"
                 onClick={(e) => {
                   e.stopPropagation();
                   const ok = window.confirm("Delete this branch and its child branches?");
@@ -135,8 +138,8 @@ const Sidebar = ({ branches, onSelect, activeBranchId, onDeleteBranch, onUpdateB
                   }
                   setOpenMenuBranchId(null);
                 }}
-                className="branch-delete"
               >
+                <img className="qt-icon qt-icon--sm" src="/QT%20icons/delete.png" alt="" />
                 Delete
               </button>
             </div>
@@ -161,7 +164,10 @@ const Sidebar = ({ branches, onSelect, activeBranchId, onDeleteBranch, onUpdateB
         ...style,
       }}
     >
-      <h3>Branches</h3>
+      <h3 className="icon-label">
+        <img className="qt-icon qt-icon--md" src="/QT%20icons/branch.png" alt="" />
+        Branches
+      </h3>
       {roots.map((root, index) => renderNode(root, 1, index === roots.length - 1))}
     </div>
   );

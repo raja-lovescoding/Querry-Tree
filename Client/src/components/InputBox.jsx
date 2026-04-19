@@ -18,16 +18,18 @@ const InputBox = ({ onSend }) => {
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingTop: "10px", borderTop: "1px solid #e5e7eb", background: "#f8fafc" }}>
+    <div className="Input-box" >
       <input
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type a message..."
-        style={{ flex: 1, padding: "10px", border: "1px solid #cbd5e1", borderRadius: "6px" }}
+        style={{ flex: 1, padding: "10px"}}
       />
-      <button onClick={handleSend}>
-        Send
+      <button onClick={handleSend} className="Send-message">
+        <img className="qt-icon qt-icon--sm" src="/QT%20icons/send.png" alt="" 
+          style={{ transform: "rotate(-90deg)" , width: "20px", height: "20px"}}
+        />
       </button>
     </div>
   );

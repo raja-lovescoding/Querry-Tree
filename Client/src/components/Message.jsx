@@ -198,7 +198,7 @@ const Message = ({
         margin: "10px 0",
         padding: "12px",
         border: isActive ? "2px solid #2563eb" : "1px solid #cbd5e1",
-        borderRadius: "10px",
+        borderRadius: "20px",
         background: msg.role === "assistant" ? "#f8fafc" : "#ffffff",
         cursor: "default",
       }}
@@ -237,7 +237,7 @@ const Message = ({
           cursor: "pointer",
         }}
       >
-        New Branch
+        <img className="qt-icon qt-icon--sm" src="/QT%20icons/branch.png" alt="" /> New Branch
       </button>
     </div>
   );
