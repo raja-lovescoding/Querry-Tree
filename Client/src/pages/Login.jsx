@@ -33,7 +33,7 @@ const Login = () => {
     <div className="login-page">
       <div className="login-card">
         <h2 className="login-title">Welcome back</h2>
-        <p className="login-subtitle">Continue with Google to access your chats.</p>
+        <p className="login-subtitle">Login with Google to access your chats.</p>
 
         <button className="google-login-button" onClick={handleGoogleLogin} disabled={isLoading}>
           {isLoading ? "Signing in..." : "Continue with Google"}

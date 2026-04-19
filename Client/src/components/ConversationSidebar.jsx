@@ -46,27 +46,15 @@ const ConversationSidebar = ({
 
   return (
     <div
-      style={{
-        width: "240px",
-        borderRight: "1px solid #d7dce5",
-        padding: "12px",
-        background: "#f3f4f6",
-        overflowY: "auto",
-        boxSizing: "border-box",
-        ...style,
-      }}
+      className="conversation-sidebar"
+      style={{ ...style }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", alignItems: "center" }}>
-        <h3 style={{ margin: 0 }}>Chats</h3>
+      <div className="sidebar-panel-header">
+        <h3 className="sidebar-title">Chats</h3>
         <button
           onClick={onCreate}
-          style={{
-            border: "1px solid #ffffff",
-            background: "#fff",
-            borderRadius: "6px",
-            padding: "6px 10px",
-            cursor: "pointer",
-          }}
+          className="sidebar-add-button"
+          aria-label="Create conversation"
         >
             <img className="qt-icon qt-icon--md" src="/QT%20icons/add.png" alt="" />
         </button>
@@ -81,19 +69,7 @@ const ConversationSidebar = ({
             }
           }}
           className={`conversation-item ${openMenuConversationId === conversation._id ? "is-menu-open" : ""}`}
-          style={{
-            padding: "9px",
-            cursor: "pointer",
-            borderRadius: "6px",
-            background:
-              conversation._id === activeConversationId ? "#e2e8f0" : "#f8fafc",
-            marginBottom: "4px",
-            border: "1px solid #e5e7eb",
-            color: "#1f2937",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-          }}
+          data-active={conversation._id === activeConversationId ? "true" : "false"}
         >
           {renamingConversationId === conversation._id ? (
             <input
@@ -104,24 +80,10 @@ const ConversationSidebar = ({
               onKeyDown={(e) => handleRenameKeyDown(e, conversation._id)}
               onBlur={() => handleRenameSave(conversation._id)}
               onClick={(e) => e.stopPropagation()}
-              style={{
-                flex: 1,
-                padding: "4px 6px",
-                border: "1px solid #2563eb",
-                borderRadius: "4px",
-                fontSize: "14px",
-              }}
+              className="inline-rename-input"
             />
           ) : (
-            <span
-              style={{
-                minWidth: 0,
-                flex: 1,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
+            <span className="conversation-label">
               {conversation.title || "New Chat"}
             </span>
           )}
@@ -150,19 +112,6 @@ const ConversationSidebar = ({
                   onClick={(e) => {
                     e.stopPropagation();
                     handleRenameClick(conversation);
-                  }}
-                  style={{
-                    display: "inline-flex",
-                    border: "none",
-                    background: "#e0f2fe",
-                    color: "#0369a1",
-                    borderRadius: "6px",
-                    padding: "6px 12px",
-                    cursor: "pointer",
-                    marginBottom: "6px",
-                    fontSize: "12px",
-                    width: "100%",
-                    justifyContent: "center",
                   }}
                 >
                     <img className="qt-icon qt-icon--sm" src="/QT%20icons/edit.png" alt="" />

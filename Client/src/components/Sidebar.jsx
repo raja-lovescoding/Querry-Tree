@@ -74,13 +74,7 @@ const Sidebar = ({ branches, onSelect, activeBranchId, onDeleteBranch, onUpdateB
             onKeyDown={(e) => handleRenameKeyDown(e, node._id)}
             onBlur={() => handleRenameSave(node._id)}
             onClick={(e) => e.stopPropagation()}
-            style={{
-              flex: 1,
-              padding: "4px 6px",
-              border: "1px solid #2563eb",
-              borderRadius: "4px",
-              fontSize: "14px",
-            }}
+            className="inline-rename-input"
           />
         ) : (
           <span className="branch-title">{node.title || `Branch ${node._id.slice(-4)}`}</span>
@@ -108,19 +102,6 @@ const Sidebar = ({ branches, onSelect, activeBranchId, onDeleteBranch, onUpdateB
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRenameClick(node);
-                }}
-                style={{
-                  display: "inline-flex",
-                  border: "none",
-                  background: "#e0f2fe",
-                  color: "#0369a1",
-                  borderRadius: "6px",
-                  padding: "6px 12px",
-                  cursor: "pointer",
-                  marginBottom: "6px",
-                  fontSize: "12px",
-                  width: "100%",
-                  justifyContent: "center",
                 }}
               >
                 <img className="qt-icon qt-icon--sm" src="/QT%20icons/edit.png" alt="" />

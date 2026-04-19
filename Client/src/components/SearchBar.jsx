@@ -7,44 +7,21 @@ const SearchBar = ({ value, onChange, onSubmit, onClear }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", alignItems: "center" }}>
-      <div style={{ position: "relative", width: "320px", maxWidth: "42vw" }}>
+    <form onSubmit={handleSubmit} className="search-form">
+      <div className="search-field-wrap">
         <input
           type="text"
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           placeholder="Search this conversation..."
-          style={{
-            width: "100%",
-            padding: "10px 40px 10px 12px",
-            border: "1px solid #cbd5e1",
-            borderRadius: "8px",
-            background: "#fff",
-          }}
+          className="search-input"
         />
         {value ? (
           <button
             type="button"
             aria-label="Clear search"
             onClick={onClear}
-            style={{
-              position: "absolute",
-              right: "8px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              width: "24px",
-              height: "24px",
-              borderRadius: "50%",
-              border: "none",
-              backgroundColor: "#e2e8f0",
-              color: "#0f172a",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "16px",
-              lineHeight: 1,
-            }}
+            className="search-clear"
           >
             ×
           </button>
@@ -52,18 +29,10 @@ const SearchBar = ({ value, onChange, onSubmit, onClear }) => {
       </div>
       <button
         type="submit"
-        style={{
-          marginLeft: "1px",
-          padding: "10px 20px",
-          backgroundColor: "#f8fbff",
-          color: "#fff",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer",
-        }}
+        className="search-submit"
       >
         <img className="qt-icon qt-icon--sm" src="/QT%20icons/search.png" alt="" 
-          style={{  width: "20px", height: "20px"}}
+          className="search-submit-icon"
         />
       </button>
     </form>

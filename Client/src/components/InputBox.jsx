@@ -24,11 +24,11 @@ const InputBox = ({ onSend }) => {
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type a message..."
-        style={{ flex: 1, padding: "10px"}}
+        className="Input-box-field"
       />
       <button onClick={handleSend} className="Send-message">
         <img className="qt-icon qt-icon--sm" src="/QT%20icons/send.png" alt="" 
-          style={{ transform: "rotate(-90deg)" , width: "20px", height: "20px"}}
+          className="send-icon"
         />
       </button>
     </div>

@@ -192,53 +192,37 @@ const Message = ({
   onBranchCreate,
   searchQuery,
 }) => {
+  const isUserMessage = msg.role === "user";
+
   return (
     <div
-      style={{
-        margin: "10px 0",
-        padding: "12px",
-        border: isActive ? "2px solid #2563eb" : "1px solid #cbd5e1",
-        borderRadius: "20px",
-        background: msg.role === "assistant" ? "#f8fafc" : "#ffffff",
-        cursor: "default",
-      }}
+      className={`message-card ${isUserMessage ? "message-card--user" : "message-card--assistant"} ${isActive ? "message-card--active" : ""}`}
     >
-      <strong>{msg.role === "user" ? "You" : "AI"}:</strong>
-      <div
-        style={{
-          marginTop: "8px",
-          lineHeight: 1.5,
-          color: "#0f172a",
-          wordBreak: "break-word",
-        }}
-      >
+      <strong className="message-role-label">{isUserMessage ? "You" : "QT"}:</strong>
+      <div className="message-content">
         {renderFormattedContent(msg.content, searchQuery)}
       </div>
 
-      <button
-        onClick={async (e) => {
-          e.stopPropagation();
-          const newBranch = await createBranch(
-            activeBranchId || null,
-            msg._id,
-            activeConversationId
-          );
+      {!isUserMessage ? (
+        <button
+          type="button"
+          className="message-branch-button"
+          onClick={async (e) => {
+            e.stopPropagation();
+            const newBranch = await createBranch(
+              activeBranchId || null,
+              msg._id,
+              activeConversationId
+            );
 
-          if (onBranchCreate) {
-            onBranchCreate(newBranch); // pass up
-          }
-        }}
-        style={{
-          marginTop: "10px",
-          padding: "6px 12px",
-          border: "1px solid #cbd5e1",
-          background: "#fff",
-          borderRadius: "6px",
-          cursor: "pointer",
-        }}
-      >
-        <img className="qt-icon qt-icon--sm" src="/QT%20icons/branch.png" alt="" /> New Branch
-      </button>
+            if (onBranchCreate) {
+              onBranchCreate(newBranch); // pass up
+            }
+          }}
+        >
+          <img className="qt-icon qt-icon--sm" src="/QT%20icons/branch.png" alt="" /> New Branch
+        </button>
+      ) : null}
     </div>
   );
 };

@@ -316,7 +316,7 @@ const ChatWindow = ({ user, onLogout }) => {
     : visibleMessages;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
+    <div className="app-shell">
       <Header
         user={user}
         onLogout={onLogout}
@@ -326,7 +326,7 @@ const ChatWindow = ({ user, onLogout }) => {
         onSearchClear={() => setSearchQuery("")}
       />
 
-      <div style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}>
+      <div className="app-layout">
         <ConversationSidebar
           conversations={conversations}
           activeConversationId={activeConversationId}
@@ -334,16 +334,16 @@ const ChatWindow = ({ user, onLogout }) => {
           onCreate={handleCreateConversation}
           onDeleteConversation={handleDeleteConversation}
           onUpdateConversation={handleUpdateConversation}
-          style={{ width: "260px" }}
+          style={{ width: "272px" }}
         />
 
-        <div style={{ flex: 1, padding: "20px", display: "flex", flexDirection: "column", minHeight: 0 }}>
+        <div className="chat-main">
           <h2 className="conversation-title">
             {conversations.find((c) => c._id === activeConversationId)?.title || "Conversation"}
           </h2>
-          {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
+          {error ? <p className="chat-error">{error}</p> : null}
 
-          <div style={{ flex: 1, overflowY: "auto", paddingBottom: "10px" }}>
+          <div className="message-list">
             {filteredMessages.map((msg) => (
               <Message
                 key={msg._id}
@@ -354,40 +354,21 @@ const ChatWindow = ({ user, onLogout }) => {
                 searchQuery={searchQuery}
                 onBranchCreate={(branch) => {
                   setBranches((prev) => [...prev, branch]);
-                  setActiveBranchId(branch._id);
-                  setActiveNodeId(branch.lastMessageId);
                 }}
               />
             ))}
             {isAIloading ? (
-              <div
-                style={{
-                  margin: "10px 0",
-                  padding: "10px",
-                  border: "1px solid gray",
-                  fontStyle: "italic",
-                  color: "#555",
-                }}
-              >
+              <div className="chat-loading"> 
                 Loading respoinse...
               </div>
             ) : null}
             {normalizedSearchQuery && filteredMessages.length === 0 ? (
-              <div
-                style={{
-                  margin: "10px 0",
-                  padding: "12px",
-                  border: "1px dashed #cbd5e1",
-                  borderRadius: "10px",
-                  color: "#64748b",
-                  background: "#f8fafc",
-                }}
-              >
+              <div className="chat-empty-state"> 
                 No results found.
               </div>
             ) : null}
             {isStreaming && streamingMessageId ? (
-              <div style={{ fontSize: "12px", color: "#64748b", marginTop: "6px" }}>
+              <div className="chat-typing"> 
                 AI is typing...
               </div>
             ) : null}
@@ -404,10 +385,9 @@ const ChatWindow = ({ user, onLogout }) => {
           onDeleteBranch={handleDeleteBranch}
             onUpdateBranch={handleUpdateBranch}
             activeConversationId={activeConversationId}
-          style={{ width: "360px" , overflowY: "hidden"}}
+          style={{ width: "332px", overflowY: "hidden" }}
         />
       </div>
-      <Footer />
     </div>
   );
 };

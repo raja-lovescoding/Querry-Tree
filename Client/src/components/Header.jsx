@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import SearchBar from "./SearchBar";
 
-const Header = ({ user, onLogout, searchQuery, onSearchChange, onSearchSubmit, onSearchClear }) => {
+const Header = ({
+  user,
+  onLogout,
+  searchQuery,
+  onSearchChange,
+  onSearchSubmit,
+  onSearchClear,
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -32,21 +39,11 @@ const Header = ({ user, onLogout, searchQuery, onSearchChange, onSearchSubmit, o
   return (
     <header className="header">
       <div className="header-left">
-        <h3 style={{ margin: 0, color: "#000" }}>
+        <h3 className="header-logo-wrap">
           <img
-            className="qt-icon qt-icon--sm"
+            className="header-logo"
             src="/QT%20icons/QT_logo.png"
             alt=""
-            style={{
-              marginRight: "8px",
-              width: "54px",
-              height: "54px",
-              borderRadius: "50%",
-              objectFit: "cover",
-              objectPosition: "center",
-              overflow: "hidden",
-              clipPath: "inset(30px, 10px, 10px, 10px)", // creates a circular mask
-            }}
           />
         </h3>
       </div>
