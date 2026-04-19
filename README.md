@@ -32,7 +32,7 @@ Concept-Tree lets you create branching chat sessions so you can explore multiple
 └── .gitignore
 ```
 
-> The exact structure may evolve over time. Check each folder's README (if present) for more details.
+> The exact structure may evolve over time..
 
 ## Getting Started
 
@@ -91,14 +91,13 @@ From the root or respective folders:
 ```bash
 # Run server
 cd Server
-npm run dev   # or: npm start
+npm start
 
 # Run client
 cd ../Client
-npm start
+npm run dev
 ```
 
-Then open the URL printed in the terminal (for example `http://localhost:3000`) in your browser.
 
 ## Usage
 
@@ -108,16 +107,10 @@ Then open the URL printed in the terminal (for example `http://localhost:3000`) 
 4. Navigate between branches to compare ideas and outcomes.
 5. Rely on the long-term memory to keep context as your conversation grows.
 
-## Roadmap
-
-- Configurable memory depth and summarization.
-- Better branch visualization (tree view, timeline, etc.).
-- Export and import chats/branches.
-- Collaboration features (shared sessions, read-only links).
 
 ## Contributing
 
-Contributions, ideas and feedback are welcome!
+Contributions, ideas, and feedback are welcome!
 
 1. Fork the repository.
 2. Create a feature branch: `git checkout -b feature/my-feature`.
@@ -125,8 +118,4 @@ Contributions, ideas and feedback are welcome!
 4. Push to the branch: `git push origin feature/my-feature`.
 5. Open a Pull Request.
 
-## License
 
-Add a license here (for example MIT). If you choose MIT, create a `LICENSE` file and mention:
-
-This project is licensed under the MIT License.
