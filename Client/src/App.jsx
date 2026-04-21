@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { getRedirectResult, onAuthStateChanged, signOut } from "firebase/auth";
 import ChatWindow from "./components/ChatWindow";
 import Login from "./pages/Login";
 import { auth } from "./auth/firebase";
@@ -10,31 +10,58 @@ function App() {
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
+    let isActive = true;
+
     if (!auth) {
       setAuthReady(true);
       return undefined;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (!currentUser) {
-        clearAuthToken();
-        setUser(null);
-        setAuthReady(true);
-        return;
+    let unsubscribe = () => {};
+
+    const initializeAuth = async () => {
+      try {
+        // Completes redirect login flow when popup fallback is used.
+        await getRedirectResult(auth);
+      } catch (_err) {
+        // Errors are surfaced on the Login page; keep app responsive here.
       }
 
-      const token = await currentUser.getIdToken(true);
-      setAuthToken(token);
-      setUser({
-        uid: currentUser.uid,
-        displayName: currentUser.displayName || "Google User",
-        email: currentUser.email || "",
-        photoURL: currentUser.photoURL || "",
-      });
-      setAuthReady(true);
-    });
+      if (!isActive) return;
 
-    return () => unsubscribe();
+      unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+        if (!isActive) return;
+
+        if (!currentUser) {
+          clearAuthToken();
+          setUser(null);
+          setAuthReady(true);
+          return;
+        }
+
+        try {
+          const token = await currentUser.getIdToken();
+          setAuthToken(token);
+        } catch (_err) {
+          clearAuthToken();
+        }
+
+        setUser({
+          uid: currentUser.uid,
+          displayName: currentUser.displayName || "Google User",
+          email: currentUser.email || "",
+          photoURL: currentUser.photoURL || "",
+        });
+        setAuthReady(true);
+      });
+    };
+
+    initializeAuth();
+
+    return () => {
+      isActive = false;
+      unsubscribe();
+    };
   }, []);
 
   const handleLogout = async () => {
