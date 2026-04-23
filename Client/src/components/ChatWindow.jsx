@@ -33,6 +33,7 @@ const ChatWindow = ({ user, onLogout }) => {
   const [recentBranchId, setRecentBranchId] = useState(null);
   const streamTimerRef = useRef(null);
   const recentBranchTimerRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     const loadConversations = async () => {
@@ -129,6 +130,16 @@ const ChatWindow = ({ user, onLogout }) => {
     setIsComposerDocked(false);
   }, [activeConversationId]);
 
+  useEffect(() => {
+    if (!activeConversationId) return;
+    if (!messagesEndRef.current) return;
+
+    messagesEndRef.current.scrollIntoView({
+      behavior: isStreaming ? "auto" : "smooth",
+      block: "end",
+    });
+  }, [messages, isStreaming, activeConversationId, activeNodeId, streamingMessageId]);
+
   const handleCreateConversation = async () => {
     try {
       const conversation = await createConversation();
@@ -162,15 +173,26 @@ const ChatWindow = ({ user, onLogout }) => {
     clearStreamingTimer();
 
     const text = typeof fullText === "string" ? fullText : "";
+    const words = text.trim() ? text.trim().split(/\s+/) : [];
     let index = 0;
 
     setIsStreaming(true);
     setStreamingMessageId(assistantMessageId);
 
+    if (words.length === 0) {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg._id === assistantMessageId ? { ...msg, content: text } : msg
+        )
+      );
+      setIsStreaming(false);
+      setStreamingMessageId(null);
+      return;
+    }
+
     streamTimerRef.current = setInterval(() => {
-      const chunk = Math.floor(Math.random() * 7) + 1;
-      index = Math.min(index + chunk, text.length);
-      const nextText = text.slice(0, index);
+      index = Math.min(index + 1, words.length);
+      const nextText = words.slice(0, index).join(" ");
 
       setMessages((prev) =>
         prev.map((msg) =>
@@ -178,12 +200,12 @@ const ChatWindow = ({ user, onLogout }) => {
         )
       );
 
-      if (index >= text.length) {
+      if (index >= words.length) {
         clearStreamingTimer();
         setIsStreaming(false);
         setStreamingMessageId(null);
       }
-    }, 28);
+    }, 18);
   };
 
   const handleSend = async (text) => {
@@ -414,6 +436,7 @@ const ChatWindow = ({ user, onLogout }) => {
                 AI is typing...
               </div>
             ) : null}
+            <div ref={messagesEndRef} />
           </div>
 
           <div className={`composer-stage ${showCenteredComposer ? "composer-stage--centered" : "composer-stage--docked"}`}>

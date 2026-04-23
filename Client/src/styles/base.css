@@ -116,6 +116,123 @@ body {
   position: relative;
 }
 
+.header-help-wrap {
+  position: relative;
+}
+
+.header-help-trigger {
+  border: 1px solid var(--border-color);
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-radius: 999px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: help;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.header-help-trigger:hover,
+.header-help-trigger:focus-visible {
+  border-color: #bfbfbf;
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.header-help-trigger[aria-expanded="true"] {
+  border-color: #a8a8a8;
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.header-help-tooltip {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(420px, 88vw);
+  max-height: min(72vh, 560px);
+  overflow: auto;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
+  padding: 14px;
+  font-size: 12px;
+  line-height: 1.45;
+  z-index: 41;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.header-help-tooltip.is-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.header-help-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.header-help-subtitle {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.header-help-text {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+}
+
+.header-help-text--tip {
+  margin-top: 7px;
+}
+
+.header-help-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 12px 0;
+}
+
+.header-help-list,
+.header-help-bullets {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--text-secondary);
+}
+
+.header-help-list li,
+.header-help-bullets li {
+  margin-bottom: 7px;
+}
+
+.header-help-list li:last-child,
+.header-help-bullets li:last-child {
+  margin-bottom: 0;
+}
+
+.header-help-list strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text-primary);
+}
+
+.header-help-list span {
+  display: block;
+}
+
 .header-user-trigger {
   display: inline-flex;
   align-items: center;
