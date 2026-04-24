@@ -1,10 +1,16 @@
 import { useState } from "react";
-import { signInWithPopup, signInWithRedirect } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signInWithRedirect,
+} from "firebase/auth";
 import { auth, googleProvider, isFirebaseConfigured } from "../auth/firebase";
 
 const Login = ({ startupError = "" }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const mapAuthErrorToMessage = (err) => {
     const errorCode = err?.code || "";
@@ -68,6 +74,35 @@ const Login = ({ startupError = "" }) => {
     }
   };
 
+  const handleEmailLogin = async (event) => {
+    event.preventDefault();
+    setError("");
+
+    if (!isFirebaseConfigured) {
+      setError("Add your Firebase env values in the Client .env file, then restart Vite.");
+      return;
+    }
+
+    if (!auth) {
+      setError("Firebase auth is not ready yet. Check your env values and restart the app.");
+      return;
+    }
+
+    if (!email.trim() || !password) {
+      setError("Enter both email and password.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+    } catch (err) {
+      setError(mapAuthErrorToMessage(err));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="login-page">
       <div className="login-video-shell" aria-hidden="true">
@@ -91,6 +126,41 @@ const Login = ({ startupError = "" }) => {
             <span className="google-login-icon" aria-hidden="true">G</span>
             <span>{isLoading ? "Signing in..." : "Continue with Google"}</span>
           </button>
+
+          <form onSubmit={handleEmailLogin} style={{ marginTop: "14px", display: "grid", gap: "8px" }}>
+            <input
+              type="email"
+              placeholder="Debug email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
+              disabled={isLoading}
+              style={{ padding: "10px 12px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.26)", background: "rgba(8,8,8,0.28)", color: "#fff" }}
+            />
+            <input
+              type="password"
+              placeholder="Debug password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="current-password"
+              disabled={isLoading}
+              style={{ padding: "10px 12px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.26)", background: "rgba(8,8,8,0.28)", color: "#fff" }}
+            />
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                padding: "10px 12px",
+                borderRadius: "10px",
+                border: "1px solid rgba(255,255,255,0.24)",
+                background: "rgba(255,255,255,0.08)",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              {isLoading ? "Signing in..." : "Sign in with Email (debug)"}
+            </button>
+          </form>
 
           {startupError ? <p className="login-error">{startupError}</p> : null}
           {error ? <p className="login-error">{error}</p> : null}
