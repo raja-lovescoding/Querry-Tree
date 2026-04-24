@@ -49,17 +49,6 @@ const Login = ({ startupError = "" }) => {
 
     try {
       setIsLoading(true);
-
-      const isDeployedHost = typeof window !== "undefined" &&
-        (window.location.hostname.includes("vercel.app") ||
-          window.location.hostname !== "localhost");
-
-      // Redirect flow is more reliable on many hosted domains and strict popup policies.
-      if (isDeployedHost) {
-        await signInWithRedirect(auth, googleProvider);
-        return;
-      }
-
       await signInWithPopup(auth, googleProvider);
     } catch (err) {
       const errorCode = err?.code || "";
