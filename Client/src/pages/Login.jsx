@@ -2,9 +2,31 @@ import { useState } from "react";
 import { signInWithPopup, signInWithRedirect } from "firebase/auth";
 import { auth, googleProvider, isFirebaseConfigured } from "../auth/firebase";
 
-const Login = () => {
+const Login = ({ startupError = "" }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const mapAuthErrorToMessage = (err) => {
+    const errorCode = err?.code || "";
+
+    if (errorCode === "auth/unauthorized-domain") {
+      return "This domain is not authorized in Firebase. Add your Vercel domain in Firebase Auth > Settings > Authorized domains.";
+    }
+
+    if (errorCode === "auth/popup-blocked") {
+      return "Popup was blocked by your browser. Redirect login will be used instead.";
+    }
+
+    if (errorCode === "auth/popup-closed-by-user") {
+      return "The Google sign-in popup was closed before completion. Try again.";
+    }
+
+    if (errorCode === "auth/operation-not-allowed") {
+      return "Google sign-in is disabled in Firebase Authentication. Enable Google provider and try again.";
+    }
+
+    return err?.message || "Google sign-in failed.";
+  };
 
   const handleGoogleLogin = async () => {
     setError("");
@@ -21,6 +43,17 @@ const Login = () => {
 
     try {
       setIsLoading(true);
+
+      const isDeployedHost = typeof window !== "undefined" &&
+        (window.location.hostname.includes("vercel.app") ||
+          window.location.hostname !== "localhost");
+
+      // Redirect flow is more reliable on many hosted domains and strict popup policies.
+      if (isDeployedHost) {
+        await signInWithRedirect(auth, googleProvider);
+        return;
+      }
+
       await signInWithPopup(auth, googleProvider);
     } catch (err) {
       const errorCode = err?.code || "";
@@ -29,13 +62,7 @@ const Login = () => {
         await signInWithRedirect(auth, googleProvider);
         return;
       }
-
-      if (errorCode === "auth/unauthorized-domain") {
-        setError("This domain is not authorized in Firebase. Add your Vercel domain in Firebase Auth > Settings > Authorized domains.");
-        return;
-      }
-
-      setError(err?.message || "Google sign-in failed.");
+      setError(mapAuthErrorToMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -65,6 +92,7 @@ const Login = () => {
             <span>{isLoading ? "Signing in..." : "Continue with Google"}</span>
           </button>
 
+          {startupError ? <p className="login-error">{startupError}</p> : null}
           {error ? <p className="login-error">{error}</p> : null}
 
           <p className="login-video-note"></p>

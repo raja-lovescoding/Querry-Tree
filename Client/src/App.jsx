@@ -8,6 +8,7 @@ import { clearAuthToken, setAuthToken } from "./services/api";
 function App() {
   const [user, setUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
+  const [authError, setAuthError] = useState("");
 
   useEffect(() => {
     let isActive = true;
@@ -23,8 +24,16 @@ function App() {
       try {
         // Completes redirect login flow when popup fallback is used.
         await getRedirectResult(auth);
-      } catch (_err) {
-        // Errors are surfaced on the Login page; keep app responsive here.
+      } catch (err) {
+        const errorCode = err?.code || "";
+
+        if (errorCode === "auth/unauthorized-domain") {
+          setAuthError("This deployment domain is not authorized in Firebase. Add it in Firebase Auth > Settings > Authorized domains.");
+        } else if (errorCode === "auth/operation-not-allowed") {
+          setAuthError("Google Sign-In is disabled in Firebase Authentication. Enable the Google provider and retry.");
+        } else {
+          setAuthError(err?.message || "Authentication failed. Please try signing in again.");
+        }
       }
 
       if (!isActive) return;
@@ -52,6 +61,7 @@ function App() {
           email: currentUser.email || "",
           photoURL: currentUser.photoURL || "",
         });
+        setAuthError("");
         setAuthReady(true);
       });
     };
@@ -138,7 +148,7 @@ function App() {
   }
 
   if (!user) {
-    return <Login />;
+    return <Login startupError={authError} />;
   }
 
   return <ChatWindow user={user} onLogout={handleLogout} />;
