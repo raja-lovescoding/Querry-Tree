@@ -10,6 +10,10 @@ const Header = ({
   onSearchClear,
   isBeigeTheme,
   onToggleTheme,
+  onToggleConversationSidebar,
+  onToggleBranchSidebar,
+  isConversationSidebarOpen,
+  isBranchSidebarOpen,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -57,6 +61,15 @@ const Header = ({
   return (
     <header className="header">
       <div className="header-left">
+        <button
+          type="button"
+          className="header-mobile-toggle"
+          aria-label="Toggle chats sidebar"
+          aria-expanded={Boolean(isConversationSidebarOpen)}
+          onClick={onToggleConversationSidebar}
+        >
+          Chats
+        </button>
         <h3 className="header-logo-wrap">
           <img
             className="header-logo"
@@ -74,6 +87,15 @@ const Header = ({
         />
       </div>
       <div className="header-right">
+        <button
+          type="button"
+          className="header-mobile-toggle"
+          aria-label="Toggle branches sidebar"
+          aria-expanded={Boolean(isBranchSidebarOpen)}
+          onClick={onToggleBranchSidebar}
+        >
+          Branches
+        </button>
         <div className="header-help-wrap" ref={helpRef}>
           <button
             type="button"

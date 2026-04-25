@@ -10,6 +10,7 @@ const ConversationSidebar = ({
   onCreate,
   onDeleteConversation,
   onUpdateConversation,
+  className,
   style,
 }) => {
   const [openMenuConversationId, setOpenMenuConversationId] = useState(null);
@@ -75,7 +76,7 @@ const ConversationSidebar = ({
 
   return (
     <div
-      className="conversation-sidebar"
+      className={`conversation-sidebar ${className || ""}`.trim()}
       ref={sidebarRef}
       style={{ ...style }}
     >

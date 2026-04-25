@@ -31,6 +31,8 @@ const ChatWindow = ({ user, onLogout }) => {
   const [draftMessage, setDraftMessage] = useState("");
   const [isComposerDocked, setIsComposerDocked] = useState(false);
   const [recentBranchId, setRecentBranchId] = useState(null);
+  const [isConversationSidebarOpen, setIsConversationSidebarOpen] = useState(false);
+  const [isBranchSidebarOpen, setIsBranchSidebarOpen] = useState(false);
   const streamTimerRef = useRef(null);
   const recentBranchTimerRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -131,6 +133,20 @@ const ChatWindow = ({ user, onLogout }) => {
   }, [activeConversationId]);
 
   useEffect(() => {
+    const handleViewportChange = () => {
+      if (window.innerWidth > 920) {
+        setIsConversationSidebarOpen(false);
+        setIsBranchSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleViewportChange);
+    return () => {
+      window.removeEventListener("resize", handleViewportChange);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!activeConversationId) return;
     if (!messagesEndRef.current) return;
 
@@ -154,6 +170,41 @@ const ChatWindow = ({ user, onLogout }) => {
     } catch (err) {
       setError(err.message || "Failed to create conversation");
     }
+  };
+
+  const handleSelectConversation = (conversationId) => {
+    setActiveConversationId(conversationId);
+    setIsConversationSidebarOpen(false);
+  };
+
+  const handleSelectBranch = (branchId) => {
+    setActiveBranchId(branchId);
+    setIsBranchSidebarOpen(false);
+  };
+
+  const handleToggleConversationSidebar = () => {
+    setIsConversationSidebarOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        setIsBranchSidebarOpen(false);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleBranchSidebar = () => {
+    setIsBranchSidebarOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        setIsConversationSidebarOpen(false);
+      }
+      return next;
+    });
+  };
+
+  const closeMobileSidebars = () => {
+    setIsConversationSidebarOpen(false);
+    setIsBranchSidebarOpen(false);
   };
 
   const markRecentBranch = (branchId) => {
@@ -379,16 +430,21 @@ const ChatWindow = ({ user, onLogout }) => {
         onSearchChange={setSearchQuery}
         onSearchSubmit={setSearchQuery}
         onSearchClear={() => setSearchQuery("")}
+        onToggleConversationSidebar={handleToggleConversationSidebar}
+        onToggleBranchSidebar={handleToggleBranchSidebar}
+        isConversationSidebarOpen={isConversationSidebarOpen}
+        isBranchSidebarOpen={isBranchSidebarOpen}
       />
 
       <div className="app-layout">
         <ConversationSidebar
           conversations={conversations}
           activeConversationId={activeConversationId}
-          onSelect={setActiveConversationId}
+          onSelect={handleSelectConversation}
           onCreate={handleCreateConversation}
           onDeleteConversation={handleDeleteConversation}
           onUpdateConversation={handleUpdateConversation}
+          className={isConversationSidebarOpen ? "is-mobile-open" : ""}
           style={{ width: "272px" }}
         />
 
@@ -455,14 +511,24 @@ const ChatWindow = ({ user, onLogout }) => {
 
         </div>
 
+        {(isConversationSidebarOpen || isBranchSidebarOpen) ? (
+          <button
+            type="button"
+            className="mobile-sidebar-overlay"
+            aria-label="Close sidebars"
+            onClick={closeMobileSidebars}
+          />
+        ) : null}
+
         <Sidebar
           branches={branches}
-          onSelect={setActiveBranchId}
+          onSelect={handleSelectBranch}
           activeBranchId={activeBranchId}
           recentBranchId={recentBranchId}
           onDeleteBranch={handleDeleteBranch}
             onUpdateBranch={handleUpdateBranch}
             activeConversationId={activeConversationId}
+          className={isBranchSidebarOpen ? "is-mobile-open" : ""}
           style={{ width: "332px", overflowY: "hidden" }}
         />
       </div>

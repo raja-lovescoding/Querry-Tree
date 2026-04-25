@@ -3,7 +3,7 @@ import { updateBranchTitle } from "../services/api";
 import ConfirmDialog from "./ConfirmDialog";
 import { formatTimestampFull, formatTimestampShort } from "../utils/formatTimestamp";
 
-const Sidebar = ({ branches, onSelect, activeBranchId, recentBranchId, onDeleteBranch, onUpdateBranch, activeConversationId, style }) => {
+const Sidebar = ({ branches, onSelect, activeBranchId, recentBranchId, onDeleteBranch, onUpdateBranch, activeConversationId, className, style }) => {
   const [openMenuBranchId, setOpenMenuBranchId] = useState(null);
   const [renamingBranchId, setRenamingBranchId] = useState(null);
   const [renameValue, setRenameValue] = useState("");
@@ -178,7 +178,7 @@ const Sidebar = ({ branches, onSelect, activeBranchId, recentBranchId, onDeleteB
 
   return (
     <div
-      className="branch-sidebar"
+      className={`branch-sidebar ${className || ""}`.trim()}
       ref={sidebarRef}
       style={{
         ...style,
