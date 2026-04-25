@@ -47,7 +47,7 @@ Concept-Tree lets you create branching chat sessions so you can explore multiple
 Clone the repository:
 
 ```bash
-git clone https://github.com/raja-lovescoding/Concept-Tree.git
+git clone https://github.com/raja-lovescoding/Arbor.git
 cd Concept-Tree
 ```
 
