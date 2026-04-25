@@ -172,6 +172,23 @@ const ChatWindow = ({ user, onLogout }) => {
     }
   };
 
+  const ensureConversationForSend = async () => {
+    if (activeConversationId) {
+      return activeConversationId;
+    }
+
+    const conversation = await createConversation();
+    if (!conversation?._id) {
+      throw new Error("Failed to create conversation");
+    }
+
+    setConversations((prev) => [conversation, ...prev]);
+    setActiveConversationId(conversation._id);
+    setIsComposerDocked(false);
+
+    return conversation._id;
+  };
+
   const handleSelectConversation = (conversationId) => {
     setActiveConversationId(conversationId);
     setIsConversationSidebarOpen(false);
@@ -260,15 +277,20 @@ const ChatWindow = ({ user, onLogout }) => {
   };
 
   const handleSend = async (text) => {
-    if (!activeConversationId) {
-      return;
-    }
-
     setDraftMessage("");
 
     clearStreamingTimer();
     setIsStreaming(false);
     setStreamingMessageId(null);
+
+    let conversationId = activeConversationId;
+
+    try {
+      conversationId = await ensureConversationForSend();
+    } catch (err) {
+      setError(err.message || "Failed to create conversation");
+      return;
+    }
 
     const currentActiveNodeId = activeNodeId;
 
@@ -289,7 +311,7 @@ const ChatWindow = ({ user, onLogout }) => {
         text,
         currentActiveNodeId,
         activeBranchId,
-        activeConversationId
+        conversationId
       );
 
       const assistantMessageId = data?.assistant?._id;
@@ -327,7 +349,7 @@ const ChatWindow = ({ user, onLogout }) => {
 
       setConversations((prev) =>
         prev.map((conversation) =>
-          conversation._id === activeConversationId
+          conversation._id === conversationId
             ? { ...conversation, lastMessageId: assistantMessageId }
             : conversation
         )

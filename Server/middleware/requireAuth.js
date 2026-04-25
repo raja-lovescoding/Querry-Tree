@@ -1,4 +1,5 @@
 import { getFirebaseAdminAuth } from "../config/firebaseAdmin.js";
+import User from "../models/User.js";
 
 export const requireAuth = async (req, res, next) => {
   const authorizationHeader = req.headers.authorization || "";
@@ -16,6 +17,30 @@ export const requireAuth = async (req, res, next) => {
 
   try {
     const decodedToken = await adminAuth.verifyIdToken(token);
+
+    try {
+      await User.findOneAndUpdate(
+        { firebaseUid: decodedToken.uid },
+        {
+          $set: {
+            email: decodedToken.email || "",
+            displayName: decodedToken.name || decodedToken.displayName || "",
+            photoURL: decodedToken.picture || "",
+            lastSeenAt: new Date(),
+          },
+          $setOnInsert: {
+            firebaseUid: decodedToken.uid,
+          },
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      );
+    } catch (syncError) {
+      console.error("Failed to sync user record:", syncError);
+    }
+
     req.user = {
       uid: decodedToken.uid,
       email: decodedToken.email || "",
