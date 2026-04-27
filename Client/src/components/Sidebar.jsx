@@ -8,6 +8,7 @@ const Sidebar = ({ branches, onSelect, activeBranchId, recentBranchId, onDeleteB
   const [renamingBranchId, setRenamingBranchId] = useState(null);
   const [renameValue, setRenameValue] = useState("");
   const [confirmBranch, setConfirmBranch] = useState(null);
+  const [collapsedBranchIds, setCollapsedBranchIds] = useState({});
   const sidebarRef = useRef(null);
 
   useEffect(() => {
@@ -65,6 +66,13 @@ const Sidebar = ({ branches, onSelect, activeBranchId, recentBranchId, onDeleteB
     }
   };
 
+  const toggleBranchCollapse = (branchId) => {
+    setCollapsedBranchIds((prev) => ({
+      ...prev,
+      [branchId]: !prev[branchId],
+    }));
+  };
+
   const map = {};
   const roots = [];
 
@@ -85,6 +93,8 @@ const Sidebar = ({ branches, onSelect, activeBranchId, recentBranchId, onDeleteB
       const rawTimestamp = node.updatedAt || node.createdAt;
       const timestamp = formatTimestampShort(rawTimestamp);
       const fullTimestamp = formatTimestampFull(rawTimestamp);
+      const hasChildren = node.children.length > 0;
+      const isCollapsed = Boolean(collapsedBranchIds[node._id]);
 
       return (
     <div
@@ -100,6 +110,23 @@ const Sidebar = ({ branches, onSelect, activeBranchId, recentBranchId, onDeleteB
         }}
         className={`branch-item ${node._id === activeBranchId ? "is-active" : ""} ${openMenuBranchId === node._id ? "is-menu-open" : ""}`}
       >
+        {hasChildren ? (
+          <button
+            type="button"
+            className="branch-collapse-toggle"
+            aria-label={isCollapsed ? "Expand branch" : "Collapse branch"}
+            aria-expanded={!isCollapsed}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleBranchCollapse(node._id);
+            }}
+          >
+            <span className="branch-collapse-icon" aria-hidden="true">▾</span>
+          </button>
+        ) : (
+          <span className="branch-collapse-spacer" aria-hidden="true" />
+        )}
+
         {renamingBranchId === node._id ? (
           <input
             autoFocus
@@ -164,11 +191,13 @@ const Sidebar = ({ branches, onSelect, activeBranchId, recentBranchId, onDeleteB
         </div>
       </div>
 
-      {node.children.length > 0 ? (
-        <div className="branch-children">
-          {node.children.map((child, index) =>
-            renderNode(child, level + 1, index === node.children.length - 1)
-          )}
+      {hasChildren ? (
+        <div className={`branch-children ${isCollapsed ? "is-collapsed" : ""}`}>
+          <div className="branch-children-inner">
+            {node.children.map((child, index) =>
+              renderNode(child, level + 1, index === node.children.length - 1)
+            )}
+          </div>
         </div>
       ) : null}
     </div>
