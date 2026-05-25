@@ -7,6 +7,12 @@ import {
 } from "firebase/auth";
 import { auth, googleProvider, isFirebaseConfigured } from "../auth/firebase";
 
+const guestCredentials = {
+  email: import.meta.env.VITE_GUEST_LOGIN_EMAIL || "guest@concepttree.local",
+  password: import.meta.env.VITE_GUEST_LOGIN_PASSWORD || "guest1234",
+  displayName: import.meta.env.VITE_GUEST_LOGIN_DISPLAY_NAME || "Guest Access",
+};
+
 const Login = ({ startupError = "" }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -79,6 +85,39 @@ const Login = ({ startupError = "" }) => {
         return;
       }
       setError(mapAuthErrorToMessage(err));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    setError("");
+
+    if (!isFirebaseConfigured) {
+      setError("Add your Firebase env values in the Client .env file, then restart Vite.");
+      return;
+    }
+
+    if (!auth) {
+      setError("Firebase auth is not ready yet. Check your env values and restart the app.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      try {
+        await signInWithEmailAndPassword(auth, guestCredentials.email, guestCredentials.password);
+      } catch (err) {
+        const errorCode = err?.code || "";
+
+        if (errorCode !== "auth/invalid-credential" && errorCode !== "auth/user-not-found") {
+          throw err;
+        }
+
+        await createUserWithEmailAndPassword(auth, guestCredentials.email, guestCredentials.password);
+      }
+    } catch (err) {
+      setError(`Guest access failed. ${mapAuthErrorToMessage(err)}`);
     } finally {
       setIsLoading(false);
     }
@@ -159,7 +198,12 @@ const Login = ({ startupError = "" }) => {
           </div>
 
           <h2 className="login-title">Welcome to Arbor</h2>
-          <p className="login-subtitle">Use email or Google to get into your workspace</p>
+          <p className="login-subtitle">Use email, Google, or the guest entry to get into your workspace</p>
+
+          <button className="guest-login-button" onClick={handleGuestLogin} disabled={isLoading}>
+            <span className="guest-login-pill" aria-hidden="true">Guest</span>
+            <span>Continue as {guestCredentials.displayName}</span>
+          </button>
 
           <button className="google-login-button" onClick={handleGoogleLogin} disabled={isLoading}>
             <span className="google-login-icon" aria-hidden="true">G</span>
