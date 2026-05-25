@@ -1,4 +1,6 @@
 import { createBranch } from "../services/api";
+import katex from "katex";
+import "katex/dist/katex.min.css";
 
 const escapeRegExp = (value) => String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -15,6 +17,33 @@ const buildHighlightRegex = (query) => {
   }
 
   return new RegExp(`(${tokens.join("|")})`, "gi");
+};
+
+const renderMathEquation = (equation, isBlock = false, keyPrefix) => {
+  try {
+    const html = katex.renderToString(equation, {
+      throwOnError: false,
+      displayMode: isBlock,
+    });
+    return (
+      <span
+        key={keyPrefix}
+        dangerouslySetInnerHTML={{ __html: html }}
+        style={{
+          display: isBlock ? "block" : "inline",
+          margin: isBlock ? "8px 0" : "0 2px",
+          overflow: "auto",
+        }}
+      />
+    );
+  } catch (e) {
+    // Fallback for invalid equations
+    return (
+      <span key={keyPrefix} style={{ color: "#ef4444" }}>
+        [Invalid equation]
+      </span>
+    );
+  }
 };
 
 const renderHighlightedText = (text, query, keyPrefix, baseKey = "t") => {
@@ -57,16 +86,64 @@ const renderHighlightedText = (text, query, keyPrefix, baseKey = "t") => {
 
 const renderInlineMarkdown = (text, keyPrefix, searchQuery) => {
   const value = String(text || "");
-  const parts = value.split(/(\*\*[^*]+\*\*)/g);
-
+  
+  // Split by both inline math ($...$) and bold (**...**)
+  // First, protect inline math from being split
+  const mathPattern = /\$([^\$\n]+)\$/g;
+  const mathMatches = [];
+  let textWithPlaceholders = value;
+  
+  let match;
+  let mathIndex = 0;
+  while ((match = mathPattern.exec(value)) !== null) {
+    mathMatches.push(match[1]);
+    textWithPlaceholders = textWithPlaceholders.replace(match[0], `__MATH_${mathIndex}__`);
+    mathIndex++;
+  }
+  
+  // Now split by bold
+  const parts = textWithPlaceholders.split(/(\*\*[^*]+\*\*)/g);
+  
   return parts.map((part, idx) => {
-    const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
-
+    // Restore math placeholders
+    let restoredPart = part;
+    mathMatches.forEach((mathExpr, i) => {
+      restoredPart = restoredPart.replace(`__MATH_${i}__`, `$${mathExpr}$`);
+    });
+    
+    const boldMatch = restoredPart.match(/^\*\*([^*]+)\*\*$/);
+    
     if (boldMatch) {
-      return <strong key={`${keyPrefix}-b-${idx}`}>{renderHighlightedText(boldMatch[1], searchQuery, `${keyPrefix}-b-${idx}`)}</strong>;
+      return (
+        <strong key={`${keyPrefix}-b-${idx}`}>
+          {renderInlineMarkdown(boldMatch[1], `${keyPrefix}-b-${idx}`, searchQuery)}
+        </strong>
+      );
     }
-
-    return <span key={`${keyPrefix}-t-${idx}`}>{renderHighlightedText(part, searchQuery, `${keyPrefix}-t-${idx}`)}</span>;
+    
+    // Check if this part contains math
+    const mathInline = restoredPart.match(/\$([^\$\n]+)\$/g);
+    if (mathInline && mathInline.length > 0) {
+      // Split and render with math
+      const subParts = restoredPart.split(/(\$[^\$\n]+\$)/g);
+      return (
+        <span key={`${keyPrefix}-t-${idx}`}>
+          {subParts.map((subPart, subIdx) => {
+            const mathMatch = subPart.match(/^\$([^\$\n]+)\$$/);
+            if (mathMatch) {
+              return renderMathEquation(mathMatch[1], false, `${keyPrefix}-m-${idx}-${subIdx}`);
+            }
+            return renderHighlightedText(subPart, searchQuery, `${keyPrefix}-t-${idx}-${subIdx}`);
+          })}
+        </span>
+      );
+    }
+    
+    return (
+      <span key={`${keyPrefix}-t-${idx}`}>
+        {renderHighlightedText(restoredPart, searchQuery, `${keyPrefix}-t-${idx}`)}
+      </span>
+    );
   });
 };
 
@@ -107,6 +184,7 @@ const renderPlainTextBlock = (text, searchQuery) => {
   const lines = String(text || "").split("\n");
   const nodes = [];
   let bulletBuffer = [];
+  let i = 0;
 
   const flushBullets = () => {
     if (bulletBuffer.length === 0) return;
@@ -122,26 +200,58 @@ const renderPlainTextBlock = (text, searchQuery) => {
     bulletBuffer = [];
   };
 
-  lines.forEach((line) => {
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Check for block equation start ($$)
+    if (line.trim().startsWith("$$")) {
+      flushBullets();
+      
+      // Collect all lines until closing $$
+      const equationLines = [line.substring(line.indexOf("$$") + 2)];
+      i++;
+      
+      while (i < lines.length) {
+        const currentLine = lines[i];
+        if (currentLine.trim().includes("$$")) {
+          const endIdx = currentLine.indexOf("$$");
+          equationLines.push(currentLine.substring(0, endIdx));
+          break;
+        }
+        equationLines.push(currentLine);
+        i++;
+      }
+      
+      const equation = equationLines.join("\n").trim();
+      if (equation) {
+        nodes.push(renderMathEquation(equation, true, `math-${nodes.length}`));
+      }
+      i++;
+      continue;
+    }
+
     const bulletMatch = line.match(/^\s*[-*]\s+(.*)$/);
 
     if (bulletMatch) {
       bulletBuffer.push(bulletMatch[1]);
-      return;
+      i++;
+      continue;
     }
 
     flushBullets();
 
     if (!line.trim()) {
       nodes.push(<div key={`sp-${nodes.length}`} style={{ height: "8px" }} />);
-      return;
+      i++;
+      continue;
     }
 
     const headingNode = renderHeadingLine(line.trim(), `h-${nodes.length}`, searchQuery);
 
     if (headingNode) {
       nodes.push(headingNode);
-      return;
+      i++;
+      continue;
     }
 
     nodes.push(
@@ -149,7 +259,8 @@ const renderPlainTextBlock = (text, searchQuery) => {
         {renderInlineMarkdown(line, `p-${nodes.length}`, searchQuery)}
       </p>
     );
-  });
+    i++;
+  }
 
   flushBullets();
   return nodes;

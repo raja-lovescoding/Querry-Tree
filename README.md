@@ -3,6 +3,7 @@
 Branched-based chatting with strong memory for all your needs.
 
 Arbor lets you create branching chat sessions so you can explore multiple ideas without losing context. Each branch preserves long-term memory, making it easy to compare directions, revisit old thoughts, and keep your reasoning organized.
+<img width="1893" height="911" alt="image" src="https://github.com/user-attachments/assets/58569137-fd23-4b11-9e7d-3a3c7debcc40" />
 
 ## Features
 
@@ -15,7 +16,7 @@ Arbor lets you create branching chat sessions so you can explore multiple ideas 
 
 ## Tech Stack
 
-- **Client**: JavaScript, HTML, CSS 
+- **Client**: JavaScript, React.js, CSS 
 - **Server**: Node.js , Express
 - **Auth**: Google login with firebase authentication
 - **Database**: Mongodb
